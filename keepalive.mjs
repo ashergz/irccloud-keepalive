@@ -117,7 +117,10 @@ class IRCCloud {
 
     if (msg.type === "oob_include") {
       this.processingOob = true;
-      fetch(new URL(msg.url, "https://www.irccloud.com").href, {
+      const base = `https://${new URL(this.wsUrl).host}`;
+      const backlogUrl = new URL(msg.url, base).href;
+      console.log(`Loading IRCCloud backlog from ${new URL(backlogUrl).pathname}`);
+      fetch(backlogUrl, {
         headers: {
           cookie: `session=${this.session}`,
           "accept-encoding": "gzip, deflate"
