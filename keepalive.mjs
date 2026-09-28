@@ -3,6 +3,7 @@ import WebSocket from "ws";
 
 const email = process.env.IRCLOUD_EMAIL;
 const password = process.env.IRCLOUD_PASSWORD;
+const forceRun = process.env.FORCE_RUN === "true";
 if (!email || !password) throw new Error("Missing IRCLOUD_EMAIL or IRCLOUD_PASSWORD");
 
 const MIN_INTERVAL = 100 * 60 * 1000;
@@ -10,7 +11,7 @@ const stateFile = new URL("./state.json", import.meta.url);
 const state = JSON.parse(await fs.readFile(stateFile, "utf8"));
 const now = Date.now();
 
-if (state.lastSuccessMs && now - state.lastSuccessMs < MIN_INTERVAL) {
+if (!forceRun && state.lastSuccessMs && now - state.lastSuccessMs < MIN_INTERVAL) {
   console.log("Not due yet.");
   process.exit(0);
 }
