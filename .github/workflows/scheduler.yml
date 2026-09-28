@@ -1,6 +1,11 @@
 name: IRCCloud Keepalive Scheduler
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/scheduler.yml"
   workflow_dispatch:
   schedule:
     - cron: "1/5 * * * *"
@@ -13,7 +18,14 @@ permissions:
   contents: write
 
 jobs:
+  push-diagnostic:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Push trigger is working; this run is diagnostic only."
+
   keepalive:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
