@@ -110,7 +110,7 @@ class IRCCloud {
 
     if (msg.type === "oob_include") {
       this.processingOob = true;
-      fetch(msg.url, { headers: { cookie: `session=${this.session}` } })
+      fetch(new URL(msg.url, "https://www.irccloud.com").href, { headers: { cookie: `session=${this.session}` } })
         .then(r => r.text())
         .then(text => {
           for (const item of jsonLines(text)) this.update(item);
