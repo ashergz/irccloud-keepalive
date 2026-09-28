@@ -1,0 +1,15 @@
+name: IRCCloud Cron Heartbeat
+
+on:
+  schedule:
+    - cron: "3/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record scheduler event
+        run: |
+          echo "GitHub scheduler fired at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "Event: ${{ github.event_name }}"
