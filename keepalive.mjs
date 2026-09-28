@@ -204,14 +204,24 @@ const auth = await login();
 const client = new IRCCloud(auth.session, auth.wsUrl);
 await client.connect();
 
+// IRCCloud buffer URLs use "undernet:1" to identify the specific
+// Undernet connection. The user has multiple Undernet connections,
+// so matching only the network name is ambiguous.
 const target = [...client.connections.values()].find(c =>
-  String(c.name || "").toLowerCase() === "undernet" ||
-  String(c.hostname || "").toLowerCase().includes("undernet")
+  Number(c.cid) === 1 &&
+  (
+    String(c.name || "").toLowerCase() === "undernet" ||
+    String(c.hostname || "").toLowerCase().includes("undernet")
+  )
 );
 
 if (!target) {
   client.close();
-  throw new Error("No Undernet connection found");
+  throw new Error(
+    `Could not find Undernet connection cid=1. Available: ${[...client.connections.values()]
+      .map(c => `cid=${c.cid} ${c.name || ""} (${c.hostname || ""})`)
+      .join(", ") || "none"}`
+  );
 }
 
 const cid = Number(target.cid);
