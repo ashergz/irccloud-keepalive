@@ -3,7 +3,7 @@ name: IRCCloud Keepalive
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "1/5 * * * *"
 
 concurrency:
   group: irccloud-keepalive
