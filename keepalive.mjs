@@ -78,6 +78,7 @@ class IRCCloud {
     this.backlogDone = false;
     this.processingOob = false;
     this.queued = [];
+    this.recentMessages = [];
   }
 
   async connect() {
@@ -152,6 +153,10 @@ class IRCCloud {
   }
 
   update(msg) {
+    if (msg.type === "buffer_msg") {
+      this.recentMessages.push({ ...msg, receivedAt: Date.now() });
+      if (this.recentMessages.length > 100) this.recentMessages.shift();
+    }
     if (msg.type === "set_shard" && msg.cookie) this.session = msg.cookie;
     if (msg.type === "makeserver") this.connections.set(Number(msg.cid), msg);
     if (msg.type === "server_details_changed") {
