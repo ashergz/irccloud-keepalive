@@ -52,7 +52,14 @@ function sleep(ms) {
 }
 
 function jsonLines(text) {
-  return String(text).split(/\r?\n/).flatMap(line => {
+  const raw = String(text).trim();
+  if (!raw) return [];
+  try {
+    const whole = JSON.parse(raw);
+    if (Array.isArray(whole)) return whole;
+    if (whole && typeof whole === "object") return [whole];
+  } catch {}
+  return raw.split(/\r?\n/).flatMap(line => {
     try { return line.trim() ? [JSON.parse(line)] : []; }
     catch { return []; }
   });
@@ -110,10 +117,20 @@ class IRCCloud {
 
     if (msg.type === "oob_include") {
       this.processingOob = true;
-      fetch(new URL(msg.url, "https://www.irccloud.com").href, { headers: { cookie: `session=${this.session}` } })
-        .then(r => r.text())
+      fetch(new URL(msg.url, "https://www.irccloud.com").href, {
+        headers: {
+          cookie: `session=${this.session}`,
+          "accept-encoding": "gzip, deflate"
+        }
+      })
+        .then(async r => {
+          if (!r.ok) throw new Error(`Backlog HTTP ${r.status}`);
+          return r.text();
+        })
         .then(text => {
-          for (const item of jsonLines(text)) this.update(item);
+          const items = jsonLines(text);
+          console.log(`Loaded ${items.length} backlog message(s).`);
+          for (const item of items) this.update(item);
           this.processingOob = false;
           for (const item of this.queued.splice(0)) this.update(item);
           this.maybeReady();
