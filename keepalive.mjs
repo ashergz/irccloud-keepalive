@@ -245,9 +245,4 @@ if (buffer?.bid) {
 
 client.close();
 
-await fs.writeFile(
-  stateFile,
-  JSON.stringify({ lastSuccessMs: Date.now() }, null, 2) + "\n"
-);
-
 console.log("IRCCloud keepalive completed successfully.");
