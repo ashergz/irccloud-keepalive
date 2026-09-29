@@ -2,8 +2,6 @@ name: IRCCloud Keepalive Scheduler
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "3/5 * * * *"
 
 concurrency:
   group: irccloud-keepalive
@@ -28,7 +26,7 @@ jobs:
         env:
           IRCLOUD_EMAIL: ${{ secrets.IRCLOUD_EMAIL }}
           IRCLOUD_PASSWORD: ${{ secrets.IRCLOUD_PASSWORD }}
-          FORCE_RUN: ${{ github.event_name == 'workflow_dispatch' }}
+          FORCE_RUN: "true"
         run: node keepalive.mjs
       - name: Save successful timestamp
         run: |
